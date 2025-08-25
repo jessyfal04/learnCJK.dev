@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>learnCJK.dev</title>
+    <link rel="stylesheet" href="/static/css/bulma.min.css" />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
+  <body>
+    <section class="section">
+      <div class="container">
+        <h1 class="title">learnCJK.dev</h1>
+        <p class="subtitle">Lookup CJK character forms and composition</p>
+
+        <div class="box">
+          <form id="lookupForm">
+            <div class="field is-grouped">
+              <p class="control is-expanded">
+                <input
+                  id="charInput"
+                  class="input"
+                  type="text"
+                  maxlength="2"
+                  placeholder="Enter 1 CJK character (e.g., 漢)"
+                  required
+                />
+              </p>
+              <p class="control">
+                <button class="button is-primary" type="submit">Lookup</button>
+              </p>
+            </div>
+          </form>
+          <p id="error" class="help is-danger" style="display:none"></p>
+        </div>
+
+        <div id="results" class="content" style="display:none">
+          <h2 class="title is-4">Results</h2>
+          <div class="columns">
+            <div class="column">
+              <h3 class="title is-6">Forms</h3>
+              <ul id="forms"></ul>
+            </div>
+            <div class="column">
+              <h3 class="title is-6">Composition</h3>
+              <ul id="composition"></ul>
+            </div>
+          </div>
+          <div>
+            <h3 class="title is-6">Variants</h3>
+            <ul id="variants"></ul>
+          </div>
+        </div>
+
+        <div class="content">
+          <p class="is-size-7 has-text-grey">API: <code>/api/lookup?char=漢</code></p>
+        </div>
+      </div>
+    </section>
+    <noscript>
+      <div class="notification is-warning">Enable JavaScript to use the lookup tool.</div>
+    </noscript>
+    <script defer src="/static/js/main.js"></script>
+  </body>
+  </html>

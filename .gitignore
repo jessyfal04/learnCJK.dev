@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.coverage
+.env
+.venv/
+
+# Node / TypeScript
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+
+# Web build artifacts (keep compiled assets tracked if committed)
+# Uncomment if you prefer to ignore built files and build in CI
+web/js/*.js
+web/css/bulma.min.css

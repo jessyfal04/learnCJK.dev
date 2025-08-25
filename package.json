@@ -1,0 +1,15 @@
+{
+  "name": "learncjk-dev",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build:ts": "tsc -p web/tsconfig.json",
+    "build:css": "mkdir -p web/css && (cp node_modules/bulma/css/bulma.min.css web/css/bulma.min.css || cp node_modules/bulma/css/bulma.css web/css/bulma.min.css)",
+    "build:web": "npm run build:ts && npm run build:css",
+    "watch:web": "tsc -w -p web/tsconfig.json"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "bulma": "^0.9.4"
+  }
+}
