@@ -85,4 +85,41 @@ form?.addEventListener('submit', async (e) => {
     errorEl.style.display = 'block';
   }
 });
+// Simple HTML includes: fetch and inject content for elements with [data-include]
+async function applyIncludes(): Promise<void> {
+  const nodes = Array.from(document.querySelectorAll<HTMLElement>('[data-include]'));
+  await Promise.all(
+    nodes.map(async (el) => {
+      const src = el.getAttribute('data-include');
+      if (!src) return;
+      try {
+        const res = await fetch(src);
+        if (!res.ok) throw new Error(`Include error: ${res.status}`);
+        el.outerHTML = await res.text();
+      } catch (e) {
+        // If include fails, hide the placeholder to avoid empty blocks
+        el.remove();
+      }
+    })
+  );
+  initNavbarBurger();
+}
 
+// Run includes as soon as possible
+applyIncludes().catch(() => {
+  /* noop */
+});
+
+function initNavbarBurger(): void {
+  const burgers = Array.from(document.querySelectorAll<HTMLElement>('.navbar-burger'));
+  burgers.forEach((burger) => {
+    const targetId = burger.getAttribute('data-target');
+    if (!targetId) return;
+    const target = document.getElementById(targetId);
+    if (!target) return;
+    burger.addEventListener('click', () => {
+      burger.classList.toggle('is-active');
+      target.classList.toggle('is-active');
+    });
+  });
+}

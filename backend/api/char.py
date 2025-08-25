@@ -1,7 +1,28 @@
 from typing import Optional, List
 from cjkradlib import RadicalFinder
 import opencc
-from .interface import CharacterInfo, Form, Composition
+from .interfaces import CharacterInfo, Form, Composition
+import os
+
+
+# Load Unihan kDefinition TSV into module-level cache on import
+_kdef_cache = {}
+try:
+	base = os.path.dirname(__file__)
+	kdef_path = os.path.normpath(os.path.join(base, os.pardir, "data", "kDefinition.tsv"))
+	with open(kdef_path, "r", encoding="utf-8") as fh:
+		for line in fh:
+			parts = line.rstrip("\n").split("\t")
+			if len(parts) >= 4:
+				# parts: codepoint, char, key, definition
+				_, ch, _, definition = parts[0], parts[1], parts[2], parts[3]
+				_kdef_cache[ch] = definition
+except FileNotFoundError:
+	# file missing is acceptable; leave cache empty
+	_kdef_cache = {}
+except Exception:
+	# any parse/read error -> keep cache empty
+	_kdef_cache = {}
 
 
 def _load_converter(name: str) -> Optional[opencc.OpenCC]:
@@ -27,29 +48,7 @@ def _same(a: str, b: str) -> bool:
 	return isinstance(a, str) and isinstance(b, str) and a == b and len(a) > 0
 
 
-def _render_markdown(ci: CharacterInfo) -> str:
-	"""Render a CharacterInfo instance into the markdown format described in lookup.md."""
-	lines: List[str] = []
-	lines.append(f"# How to name a CJK character")
-	lines.append(f"- Input character: {ci.char}")
-	lines.append("")
-	lines.append("## Forms")
-	lines.append(f"- Japanese form: {ci.japanese.char} — same as input? {'Yes' if ci.japanese.same_as_input else 'No'}")
-	lines.append(f"- Simplified form: {ci.simplified.char} — same as input? {'Yes' if ci.simplified.same_as_input else 'No'}")
-	lines.append(f"- Traditional form: {ci.traditional.char} — same as input? {'Yes' if ci.traditional.same_as_input else 'No'}")
-	lines.append("")
-	lines.append("## Composition")
-	lines.append(f"- Decomposition: {ci.composition.decomposition}")
-	lines.append(f"- JP supercompositions: {ci.composition.jp_supercompositions}")
-	lines.append(f"- ZH supercompositions: {ci.composition.zh_supercompositions}")
-	lines.append(f"- Merged supercompositions: {ci.composition.merged_supercompositions}")
-	lines.append("")
-	lines.append("## Variants")
-	lines.append(f"- Other variants (excluding canonical forms): {ci.variants}")
-	return "\n".join(lines)
-
-
-def get_info(char: str, input_lang: str = "auto", output_format: Optional[str] = None, verbose: bool = False) -> CharacterInfo:
+def get_info(char: str, input_lang: str = "auto", output_format: Optional[str] = None) -> CharacterInfo:
 	"""
 	Get character info for a single CJK character and return a CharacterInfo instance.
 	"""
@@ -164,10 +163,10 @@ def get_info(char: str, input_lang: str = "auto", output_format: Optional[str] =
 
 	comp = Composition(
 		decomposition=sorted(compositions),
-		jp_supercompositions=sorted(resultJP.supercompositions),
-		zh_supercompositions=sorted(resultZH.supercompositions),
 		merged_supercompositions=sorted(supercompositions),
 	)
+
+	unihan_def = _kdef_cache.get(char)
 
 	ci = CharacterInfo(
 		char=char,
@@ -177,28 +176,15 @@ def get_info(char: str, input_lang: str = "auto", output_format: Optional[str] =
 		traditional=t_form,
 		composition=comp,
 		variants=sorted(variants),
+		unihan_definition=unihan_def,
 	)
 
-	# Optionally render markdown
-	if output_format == 'md':
-		ci.md = _render_markdown(ci)
-
-	# Optionally print a short summary
-	if verbose:
-		print(f"Character: {ci.char}")
-		print(f"Detected input language: {ci.detected_input_lang}")
-		print(f"Japanese: {ci.japanese.char}")
-		print(f"Simplified: {ci.simplified.char}")
-		print(f"Traditional: {ci.traditional.char}")
-		print(f"Compositions: {ci.composition.decomposition}")
-		print(f"Supercompositions: {ci.composition.merged_supercompositions}")
-		print(f"Variants: {ci.variants}")
+	# Note: markdown rendering removed per interfaces change
 
 	return ci
 
 
 if __name__ == "__main__":
 	# Example usage: change the character and the input_lang to test different cases
-	ci = get_info("価", input_lang="auto", output_format='md', verbose=True)
-	print('\n--- md output ---\n')
-	print(ci.md)
+	ci = get_info("価", input_lang="auto")
+	print(ci.to_dict())

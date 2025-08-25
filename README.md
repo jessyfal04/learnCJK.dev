@@ -12,10 +12,13 @@ Minimal web app to explore CJK character forms and composition. It exposes a typ
 api/                # Core lookup library (dataclasses + logic)
   interface.py      # Form/Composition/CharacterInfo types
   lookup.py         # get_info() + markdown rendering
-server/
-  main.py           # FastAPI app, static mount
-web/
-  index.html        # Static page (Bulma UI)
+backend/
+  server/
+    main.py         # FastAPI app, static mount
+  api/
+    ...             # Python API (lookup library)
+frontend/
+  html/             # HTML pages and includes (index.html, header.html, footer.html)
   css/              # styles.css and bulma.min.css (copied from npm)
   js/               # compiled TypeScript output (main.js)
   ts/               # TypeScript sources (main.ts)
@@ -53,8 +56,8 @@ make run
 ```
 
 ## Makefile Commands
-- `make setup`: venv + pip install + npm install + build web
-- `make web`: build TypeScript and copy Bulma to `web/css/bulma.min.css`
+- `make setup`: venv + pip install + npm install + build frontend
+- `make web`: build TypeScript and copy Bulma to `frontend/css/bulma.min.css`
 - `make run`: start API with reload at `http://localhost:8000`
 - `make dev`: run TypeScript watcher and API together (Ctrl+C to stop)
 - `make clean`: remove venv, node_modules, Python caches, built css/js
@@ -75,8 +78,12 @@ curl 'http://localhost:8000/api/lookup?char=漢'
 ```
 
 ## Static Site
-- Served at `/` from `web/`. Static mount is `/static` → `web/`.
+- Served at `/` from `frontend/html/index.html`. Static mount is `/static` → `frontend/`.
 - Edit `web/ts/main.ts` and run `make dev` (includes TS watcher). Refresh browser to see changes.
+- Common header/footer are included via placeholders in `index.html`:
+  - `<div data-include="/static/html/header.html"></div>`
+  - `<div data-include="/static/html/footer.html"></div>`
+  The include loader in `frontend/ts/main.ts` fetches and injects these at runtime using `fetch` (no extra npm dependency).
 
 ## Troubleshooting
 - OpenCC install issues: install system libs noted above, then `pip install -r requirements.txt`.
