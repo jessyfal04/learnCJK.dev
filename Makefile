@@ -2,7 +2,7 @@ SHELL := /bin/bash
 PY=python
 VENVDIR=.venv
 
-.PHONY: venv pip npm web install run dev dev-web watch-web test fmt setup clean
+.PHONY: venv pip npm web install run dev dev-web watch-web serve-web test fmt setup clean
 
 venv:
 	$(PY) -m venv $(VENVDIR)
@@ -27,9 +27,12 @@ run:
 watch-web:
 	npm run watch:web
 
+serve-web:
+	npm run serve:web
+
 dev:
-	@echo "Starting TS watch and API (Ctrl+C to stop)"
-	@bash -lc 'trap "kill 0" EXIT; npm run watch:web & . $(VENVDIR)/bin/activate; uvicorn backend.server.main:app --reload --host 0.0.0.0 --port 8000'
+	@echo "Starting TS watch, frontend server, and API (Ctrl+C to stop)"
+	@bash -lc 'trap "kill 0" EXIT; npm run watch:web & npm run serve:web & . $(VENVDIR)/bin/activate; uvicorn backend.server.main:app --reload --host 0.0.0.0 --port 8000'
 
 test:
 	@echo "Add pytest and tests/ then run: pytest -q"

@@ -6,7 +6,8 @@
     "build:ts": "tsc -p frontend/tsconfig.json",
     "build:css": "mkdir -p frontend/css && (cp node_modules/bulma/css/bulma.min.css frontend/css/bulma.min.css || cp node_modules/bulma/css/bulma.css frontend/css/bulma.min.css)",
     "build:web": "npm run build:ts && npm run build:css",
-    "watch:web": "tsc -w -p frontend/tsconfig.json"
+    "watch:web": "tsc -w -p frontend/tsconfig.json",
+    "serve:web": "node frontend/js/dev_server.js || (npm run build:ts && node frontend/js/dev_server.js)"
   },
   "devDependencies": {
     "bulma": "^1.0.4",

@@ -1,3 +1,6 @@
+// Note: use explicit .js extension for browser ESM imports after TS compile
+import { startRouter, navigateToChar } from './router.js';
+
 const form = document.getElementById('lookupForm') as HTMLFormElement;
 const input = document.getElementById('charInput') as HTMLInputElement;
 const errorEl = document.getElementById('error') as HTMLElement;
@@ -5,6 +8,11 @@ const results = document.getElementById('results') as HTMLElement;
 const formsEl = document.getElementById('forms') as HTMLElement;
 const compEl = document.getElementById('composition') as HTMLElement;
 const variantsEl = document.getElementById('variants') as HTMLElement;
+const unihanEl = document.getElementById('unihan') as HTMLElement;
+const cjklearnEl = document.getElementById('cjklearn') as HTMLElement;
+const summaryChar = document.getElementById('summaryChar') as HTMLElement | null;
+const summaryLang = document.getElementById('summaryLang') as HTMLElement | null;
+const lookupBtn = document.getElementById('lookupBtn') as HTMLButtonElement | null;
 
 type FormInfo = { char: string; same_as_input: boolean };
 type Composition = {
@@ -13,6 +21,7 @@ type Composition = {
   zh_supercompositions: string[];
   merged_supercompositions: string[];
 };
+type CJKLearn = { [k: string]: string | null } | null;
 type LookupResponse = {
   char: string;
   detected_input_lang: 'sc' | 'tc' | 'jp' | string;
@@ -22,17 +31,31 @@ type LookupResponse = {
   composition: Composition;
   variants: string[];
   md?: string | null;
+  unihan_definition?: string | null;
+  cjk_learn?: CJKLearn;
 };
 
 function item(key: string, value: string | string[]): string {
-  const v = Array.isArray(value) ? value.join(', ') : value;
+  const v = Array.isArray(value) ? (value.length ? value.join(', ') : '—') : value || '—';
   return `<li><strong>${key}:</strong> ${v}</li>`;
+}
+
+function renderCjkLearn(obj: CJKLearn | undefined | null): string {
+  if (!obj) return '—';
+  // show key: value per line
+  return Object.entries(obj)
+    .map(([k, v]) => `${k}: ${v ?? '—'}`)
+    .join('\n');
 }
 
 function renderResults(d: LookupResponse): void {
   formsEl.innerHTML = '';
   compEl.innerHTML = '';
   variantsEl.innerHTML = '';
+  if (unihanEl) unihanEl.textContent = '—';
+  if (cjklearnEl) cjklearnEl.textContent = '—';
+  if (summaryChar) summaryChar.textContent = d.char || '—';
+  if (summaryLang) summaryLang.textContent = d.detected_input_lang || '—';
 
   formsEl.insertAdjacentHTML(
     'beforeend',
@@ -65,15 +88,17 @@ function renderResults(d: LookupResponse): void {
     variantsEl.insertAdjacentHTML('beforeend', `<li>${v}</li>`);
   });
 
+  if (unihanEl) unihanEl.textContent = d.unihan_definition || '—';
+  if (cjklearnEl) cjklearnEl.textContent = renderCjkLearn(d.cjk_learn);
+
   results.style.display = 'block';
 }
 
-form?.addEventListener('submit', async (e) => {
-  e.preventDefault();
+async function doLookup(ch: string, _pushHistory = false): Promise<void> {
+  if (!ch) return;
   errorEl.style.display = 'none';
   results.style.display = 'none';
-  const ch = input.value.trim();
-  if (!ch) return;
+  if (lookupBtn) lookupBtn.classList.add('is-loading');
   try {
     const res = await fetch(`/api/lookup?char=${encodeURIComponent(ch)}`);
     if (!res.ok) throw new Error(`API error: ${res.status}`);
@@ -84,7 +109,27 @@ form?.addEventListener('submit', async (e) => {
     errorEl.textContent = msg;
     errorEl.style.display = 'block';
   }
+  finally {
+    if (lookupBtn) lookupBtn.classList.remove('is-loading');
+  }
+}
+
+// replace the submit handler to use router navigation
+form?.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const ch = input.value.trim();
+  if (!ch) return;
+  input.value = ch;
+  // navigate updates history and triggers the router handler which performs lookup
+  navigateToChar(ch);
 });
+
+// start router: handler receives the char and triggers lookup (without pushing history again)
+startRouter((ch: string) => {
+  input.value = ch;
+  void doLookup(ch, false);
+});
+
 // Simple HTML includes: fetch and inject content for elements with [data-include]
 async function applyIncludes(): Promise<void> {
   const nodes = Array.from(document.querySelectorAll<HTMLElement>('[data-include]'));

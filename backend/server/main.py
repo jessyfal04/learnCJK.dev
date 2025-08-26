@@ -2,8 +2,6 @@ from typing import Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
 
 from backend.api.char import get_info
 
@@ -34,14 +32,4 @@ def api_lookup(char: str, output_format: Optional[str] = None):
     return ci.to_dict()
 
 
-# Static site
-app.mount("/static", StaticFiles(directory="frontend"), name="static")
-
-
-@app.get("/", response_class=HTMLResponse)
-def index() -> HTMLResponse:
-    try:
-        with open("frontend/html/index.html", "r", encoding="utf-8") as f:
-            return HTMLResponse(content=f.read())
-    except FileNotFoundError:
-        return HTMLResponse(content="<h1>learnCJK.dev</h1><p>Static site not found.</p>", status_code=200)
+# Note: Frontend is served by a separate Node dev server in dev.

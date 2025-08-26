@@ -24,6 +24,28 @@ class Composition:
 
 
 @dataclass
+class CJKLearn:
+    keyword_rtk: Optional[str]
+    keyword_rth: Optional[str]
+    keyword_rsh: Optional[str]
+    index_hanja: Optional[str]
+    index_rtk: Optional[str]
+    index_rth: Optional[str]
+    index_rsh: Optional[str]
+
+    def to_dict(self) -> dict:
+        return {
+            "keyword_rtk": self.keyword_rtk,
+            "keyword_rth": self.keyword_rth,
+            "keyword_rsh": self.keyword_rsh,
+            "index_hanja": self.index_hanja,
+            "index_rtk": self.index_rtk,
+            "index_rth": self.index_rth,
+            "index_rsh": self.index_rsh,
+        }
+
+
+@dataclass
 class CharacterInfo:
     """Structured return type for character lookup results."""
     char: str
@@ -34,6 +56,7 @@ class CharacterInfo:
     composition: Composition
     variants: List[str]
     unihan_definition: Optional[str]
+    cjk_learn: Optional[CJKLearn]
 
     def to_dict(self) -> dict:
         return {
@@ -45,7 +68,8 @@ class CharacterInfo:
             "composition": self.composition.to_dict(),
             "variants": self.variants,
             "unihan_definition": self.unihan_definition,
+            "cjk_learn": self.cjk_learn,
         }
 
 
-__all__ = ["Form", "Composition", "CharacterInfo"]
+__all__ = ["Form", "Composition", "CharacterInfo", "CJKLearn"]

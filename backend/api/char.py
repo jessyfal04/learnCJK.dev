@@ -3,26 +3,55 @@ from cjkradlib import RadicalFinder
 import opencc
 from .interfaces import CharacterInfo, Form, Composition
 import os
+import json
 
 
-# Load Unihan kDefinition TSV into module-level cache on import
+# Load Unihan kDefinition JSON into module-level cache on import
 _kdef_cache = {}
+_cjk_learn_cache = {}
+
+base = os.path.dirname(__file__)
+data_dir = os.path.normpath(os.path.join(base, os.pardir, "data"))
+json_path = os.path.join(data_dir, "kDefinition.json")
+cjk_json_path = os.path.join(data_dir, "CJK_learn.json")
+
+# Load Unihan kDefinition (map form expected)
 try:
-	base = os.path.dirname(__file__)
-	kdef_path = os.path.normpath(os.path.join(base, os.pardir, "data", "kDefinition.tsv"))
-	with open(kdef_path, "r", encoding="utf-8") as fh:
-		for line in fh:
-			parts = line.rstrip("\n").split("\t")
-			if len(parts) >= 4:
-				# parts: codepoint, char, key, definition
-				_, ch, _, definition = parts[0], parts[1], parts[2], parts[3]
-				_kdef_cache[ch] = definition
-except FileNotFoundError:
-	# file missing is acceptable; leave cache empty
-	_kdef_cache = {}
+	if os.path.exists(json_path):
+		with open(json_path, "r", encoding="utf-8") as fh:
+			data = json.load(fh)
+			if isinstance(data, dict):
+				for ch, val in data.items():
+					definition = None
+					if isinstance(val, dict):
+						definition = val.get("definition")
+					elif isinstance(val, str):
+						definition = val
+					if isinstance(ch, str) and isinstance(definition, str):
+						_kdef_cache[ch] = definition
 except Exception:
 	# any parse/read error -> keep cache empty
 	_kdef_cache = {}
+
+# Load CJK_learn (map form expected)
+try:
+	if os.path.exists(cjk_json_path):
+		with open(cjk_json_path, "r", encoding="utf-8") as fh:
+			cdata = json.load(fh)
+			if isinstance(cdata, dict):
+				for ch, val in cdata.items():
+					if isinstance(ch, str) and isinstance(val, dict):
+						_cjk_learn_cache[ch] = {
+							"keyword_rtk": val.get("keyword_rtk"),
+							"keyword_rth": val.get("keyword_rth"),
+							"keyword_rsh": val.get("keyword_rsh"),
+							"index_hanja": val.get("index_hanja"),
+							"index_rtk": val.get("index_rtk"),
+							"index_rth": val.get("index_rth"),
+							"index_rsh": val.get("index_rsh"),
+						}
+except Exception:
+	_cjk_learn_cache = {}
 
 
 def _load_converter(name: str) -> Optional[opencc.OpenCC]:
@@ -167,6 +196,7 @@ def get_info(char: str, input_lang: str = "auto", output_format: Optional[str] =
 	)
 
 	unihan_def = _kdef_cache.get(char)
+	cjk_learn = _cjk_learn_cache.get(char)
 
 	ci = CharacterInfo(
 		char=char,
@@ -177,6 +207,7 @@ def get_info(char: str, input_lang: str = "auto", output_format: Optional[str] =
 		composition=comp,
 		variants=sorted(variants),
 		unihan_definition=unihan_def,
+		cjk_learn=cjk_learn,
 	)
 
 	# Note: markdown rendering removed per interfaces change

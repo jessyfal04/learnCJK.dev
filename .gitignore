@@ -9,6 +9,11 @@ __pycache__/
 
 # Node / TypeScript
 node_modules/
+frontend-app/node_modules/
+frontend-app/.svelte-kit/
+frontend-app/build/
+**/.svelte-kit/
+**/node_modules/
 npm-debug.log*
 yarn-error.log*
 

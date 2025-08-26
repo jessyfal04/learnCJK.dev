@@ -47,10 +47,11 @@ npm run build:web
 
 ## Run Locally
 ```
-# Build web assets then start FastAPI with reload
+# Build web assets then start both servers (frontend + backend)
 make dev
+# Frontend: http://localhost:5173 (proxies /api → http://localhost:8000)
 
-# Alternatively (assumes web assets already built)
+# Alternatively (assumes web assets already built) — API only
 make run
 # Open http://localhost:8000
 ```
@@ -78,12 +79,22 @@ curl 'http://localhost:8000/api/lookup?char=漢'
 ```
 
 ## Static Site
-- Served at `/` from `frontend/html/index.html`. Static mount is `/static` → `frontend/`.
-- Edit `web/ts/main.ts` and run `make dev` (includes TS watcher). Refresh browser to see changes.
-- Common header/footer are included via placeholders in `index.html`:
+- In dev, a small Node server serves the frontend at `http://localhost:5173` and proxies `/api/*` to the backend at `http://localhost:8000`.
+- Edit `frontend/ts/*.ts` and run `make dev` (includes TS watcher, frontend server, and API). Refresh browser to see changes.
+- Common header/footer are included via placeholders in `frontend/html/index.html`:
   - `<div data-include="/static/html/header.html"></div>`
   - `<div data-include="/static/html/footer.html"></div>`
   The include loader in `frontend/ts/main.ts` fetches and injects these at runtime using `fetch` (no extra npm dependency).
+
+### Client-side Router
+- Frontend navigation uses a lightweight TS router (`frontend/ts/router.ts`) with History API.
+- Character pages are at `/char/:ch` (e.g., `/char/漢`). The frontend dev server serves `index.html` for any `/char/*` path so direct loads and refreshes work; the router then reads the URL and performs the lookup.
+
+### Dev Server Controls
+- Start only the frontend server: `npm run serve:web` (defaults to port `5173`).
+- Configure ports/env:
+  - `FRONTEND_PORT=5173 npm run serve:web` to change the frontend port.
+  - `BACKEND_URL=http://localhost:8000 npm run serve:web` to adjust API proxy target.
 
 ## Troubleshooting
 - OpenCC install issues: install system libs noted above, then `pip install -r requirements.txt`.
