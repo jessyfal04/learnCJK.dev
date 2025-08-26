@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>learnCJK.dev — Lists</title>
+    <link rel="stylesheet" href="/static/css/bulma.min.css" />
+    <link rel="stylesheet" href="/static/css/app.css" />
+  </head>
+  <body>
+    <div data-include="/static/html/header.html"></div>
+
+    <section class="hero is-link is-small">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title">Lists</h1>
+          <p class="subtitle">RTK / RTH / RSH / Hanja</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <form id="listsForm" class="box">
+          <div class="columns is-multiline">
+            <div class="column is-4">
+              <label class="label" for="listType">List Type</label>
+              <div class="select is-fullwidth">
+                <select id="listType">
+                  <option value="rtk">RTK</option>
+                  <option value="rth">RTH</option>
+                  <option value="rsh">RSH</option>
+                  <option value="hanja">Hanja</option>
+                </select>
+              </div>
+            </div>
+            <div class="column is-4">
+              <label class="label" for="listField">Details</label>
+              <div class="select is-fullwidth">
+                <select id="listField">
+                  <option value="chars">Characters only</option>
+                  <option value="fields">With details</option>
+                </select>
+              </div>
+            </div>
+            <div class="column is-4" style="display:flex;align-items:flex-end;">
+              <button class="button is-link" type="submit">Load</button>
+            </div>
+          </div>
+        </form>
+
+        <div id="listResults" class="content"></div>
+      </div>
+    </section>
+
+    <div data-include="/static/html/footer.html"></div>
+    <script type="module" src="/static/js/main.js"></script>
+  </body>
+  </html>

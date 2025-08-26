@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>learnCJK.dev</title>
+    <title>learnCJK.dev — Intro</title>
     <link rel="stylesheet" href="/static/css/bulma.min.css" />
     <link rel="stylesheet" href="/static/css/app.css" />
   </head>
@@ -13,124 +13,28 @@
       <div class="hero-body">
         <div class="container">
           <h1 class="title">learnCJK.dev</h1>
-          <p class="subtitle">Lookup CJK character forms and composition</p>
+          <p class="subtitle">Minimal tools to explore CJK characters</p>
         </div>
       </div>
     </section>
 
     <section class="section">
-      <div class="container">
-        <div class="box">
-          <form id="lookupForm">
-            <div class="field is-grouped">
-              <p class="control is-expanded">
-                <input
-                  id="charInput"
-                  class="input"
-                  type="text"
-                  maxlength="1"
-                  placeholder="Enter 1 CJK character (e.g., 漢)"
-                  required
-                />
-              </p>
-              <p class="control">
-                <button id="lookupBtn" class="button is-primary" type="submit">Lookup</button>
-              </p>
-            </div>
-          </form>
-          <div id="error" class="notification is-danger is-light" style="display:none"></div>
-        </div>
+      <div class="container content">
+        <p>
+          Learn and explore Chinese/Japanese/Korean characters:
+        </p>
+        <ul>
+          <li><a href="/char">Character lookup</a>: forms, composition, and variants.</li>
+          <li><a href="/static/html/lists.html">Lists</a>: RTK/RTH/RSH and Hanja lists with ordering and details.</li>
+        </ul>
 
-        <div id="results" class="content" style="display:none">
-          <div class="columns is-multiline">
-            <div class="column is-full">
-              <div class="card">
-                <header class="card-header">
-                  <p class="card-header-title">Summary</p>
-                </header>
-                <div class="card-content">
-                  <div class="content">
-                    <div class="tags">
-                      <span class="tag is-info">Char: <span id="summaryChar">—</span></span>
-                      <span class="tag is-link">Detected: <span id="summaryLang">—</span></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="column is-one-third">
-              <div class="card">
-                <header class="card-header">
-                  <p class="card-header-title">Forms</p>
-                </header>
-                <div class="card-content">
-                  <div class="content">
-                    <ul id="forms"></ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="column is-one-third">
-              <div class="card">
-                <header class="card-header">
-                  <p class="card-header-title">Composition</p>
-                </header>
-                <div class="card-content">
-                  <div class="content">
-                    <ul id="composition"></ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="column is-one-third">
-              <div class="card">
-                <header class="card-header">
-                  <p class="card-header-title">Variants</p>
-                </header>
-                <div class="card-content">
-                  <div class="content">
-                    <ul id="variants"></ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="column is-half">
-              <div class="card">
-                <header class="card-header">
-                  <p class="card-header-title">Unihan definition</p>
-                </header>
-                <div class="card-content">
-                  <div class="content">
-                    <p id="unihan">—</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="column is-half">
-              <div class="card">
-                <header class="card-header">
-                  <p class="card-header-title">CJK Learn</p>
-                </header>
-                <div class="card-content">
-                  <div class="content">
-                    <pre id="cjklearn" style="white-space:pre-wrap; margin:0">—</pre>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <h3>Quick API</h3>
+        <pre><code>GET /api/char?char=漢
+GET /api/lists?type=rtk&amp;field=chars
+GET /api/lists?type=hanja&amp;field=fields</code></pre>
       </div>
     </section>
     <div data-include="/static/html/footer.html"></div>
-    <noscript>
-      <div class="notification is-warning">Enable JavaScript to use the lookup tool.</div>
-    </noscript>
     <script type="module" src="/static/js/main.js"></script>
   </body>
   </html>

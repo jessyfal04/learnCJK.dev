@@ -39,7 +39,7 @@ fmt:
 
 
 clean:
-	rm -rf $(VENVDIR) node_modules frontend/js/*.js frontend/js/*.js.map frontend/css/bulma.min.css
+	rm -rf $(VENVDIR) node_modules frontend/js frontend/css/bulma.min.css
 	find . -type d -name "__pycache__" -prune -exec rm -rf {} +
 	find . -type f -name "*.py[co]" -delete
 	rm -rf .pytest_cache .mypy_cache

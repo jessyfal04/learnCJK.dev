@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from backend.api.char import get_info
-import json
+from backend.api.list import get_list
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -52,19 +52,29 @@ def ensure_css() -> None:
 
 
 def ensure_ts_built() -> None:
-    """Compile TS if main.js is missing or older than sources."""
+    """Compile TS if main.js is missing or older than any TS source.
+
+    Previous logic only compared main.ts vs main.js; here we consider the newest
+    .ts file under frontend/ts to trigger rebuilds when dependencies change.
+    """
     JS_DIR.mkdir(parents=True, exist_ok=True)
-    ts_main = TS_DIR / "main.ts"
     js_main = JS_DIR / "main.js"
-    if not ts_main.exists():
+    if not TS_DIR.exists():
         return
     try:
-        ts_mtime = ts_main.stat().st_mtime
-        js_mtime = js_main.stat().st_mtime if js_main.exists() else 0
+        newest_ts_mtime = 0.0
+        for p in TS_DIR.rglob("*.ts"):
+            try:
+                m = p.stat().st_mtime
+                if m > newest_ts_mtime:
+                    newest_ts_mtime = m
+            except OSError:
+                continue
+        js_mtime = js_main.stat().st_mtime if js_main.exists() else 0.0
     except OSError:
-        ts_mtime, js_mtime = 0, 0
+        newest_ts_mtime, js_mtime = 0.0, 0.0
 
-    if (not js_main.exists()) or ts_mtime > js_mtime:
+    if (not js_main.exists()) or newest_ts_mtime > js_mtime:
         try:
             subprocess.run([_tsc_bin(), "-p", str(FRONTEND_DIR / "tsconfig.json")], cwd=str(ROOT), check=True)
         except Exception:
@@ -80,8 +90,8 @@ def healthz() -> dict:
     return {"status": "ok"}
 
 
-@app.get("/api/lookup")
-def api_lookup(char: str, output_format: Optional[str] = None):
+@app.get("/api/char")
+def api_char(char: str, output_format: Optional[str] = None):
     if not char:
         raise HTTPException(status_code=400, detail="Query parameter 'char' is required")
     ci = get_info(char=char, input_lang="auto", output_format=output_format)
@@ -90,32 +100,12 @@ def api_lookup(char: str, output_format: Optional[str] = None):
 
 @app.get("/api/lists")
 def api_lists(type: str, field: str):
-    """
-    Return list data from backend/data/lists.json.
-
-    Query params:
-    - type: one of rtk, rth, rsh, hanja
-    - field: one of chars, fields
-    """
-    lists_path = ROOT / "backend" / "data" / "lists.json"
-    if not lists_path.exists():
-        raise HTTPException(status_code=500, detail="lists.json not found. Generate it with cjk_list_to_json.py")
-
     try:
-        with open(lists_path, "r", encoding="utf-8") as fh:
-            data = json.load(fh)
-    except Exception:
-        raise HTTPException(status_code=500, detail="Failed to read lists.json")
-
-    if type not in data:
-        raise HTTPException(status_code=400, detail=f"Invalid type. Expected one of {sorted(data.keys())}")
-    if field not in {"chars", "fields"}:
-        raise HTTPException(status_code=400, detail="Invalid field. Expected 'chars' or 'fields'")
-
-    bucket = data[type]
-    if field not in bucket:
-        raise HTTPException(status_code=400, detail=f"Field '{field}' not available for type '{type}'")
-    return bucket[field]
+        return get_list(type=type, field=field)
+    except FileNotFoundError:
+        raise HTTPException(status_code=500, detail="lists.json not found. Generate it with cjk_list_to_json.py")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 # Pre-build assets opportunistically
@@ -134,11 +124,19 @@ def index() -> Response:
 def index_html() -> FileResponse:
     return FileResponse(HTML_DIR / "index.html")
 
+@app.get("/char")
+def page_char() -> FileResponse:
+    return FileResponse(HTML_DIR / "char.html")
+
+@app.get("/lists")
+def page_lists() -> FileResponse:
+    return FileResponse(HTML_DIR / "lists.html")
+
 
 @app.get("/char/{_path:path}")
 def spa_char(_path: str) -> FileResponse:
-    # SPA fallback: serve index.html for /char/*
-    return FileResponse(HTML_DIR / "index.html")
+    # SPA fallback: serve char.html for /char/*
+    return FileResponse(HTML_DIR / "char.html")
 
 
 @app.get("/static/js/main.js")

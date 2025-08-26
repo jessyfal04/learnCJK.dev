@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>learnCJK.dev — Char</title>
+    <link rel="stylesheet" href="/static/css/bulma.min.css" />
+    <link rel="stylesheet" href="/static/css/app.css" />
+  </head>
+  <body>
+    <div data-include="/static/html/header.html"></div>
+
+    <section class="hero is-primary is-small">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title">Character Lookup</h1>
+          <p class="subtitle">Explore forms, composition, and variants</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="box">
+          <form id="lookupForm">
+            <div class="field is-grouped">
+              <p class="control is-expanded">
+                <input
+                  id="charInput"
+                  class="input"
+                  type="text"
+                  maxlength="1"
+                  placeholder="Enter 1 CJK character (e.g., 漢)"
+                  required
+                />
+              </p>
+              <p class="control">
+                <button id="lookupBtn" class="button is-primary" type="submit">Lookup</button>
+              </p>
+            </div>
+          </form>
+          <div id="error" class="notification is-danger is-light" style="display:none"></div>
+        </div>
+
+        <div id="results" class="content" style="display:none">
+          <div id="cjkLearn" class="box cjk-learn is-centered" style="display:none"></div>
+
+          <!-- Tile 2: Forms and variants (2:1) -->
+          <div class="box">
+            <h3 class="title is-5">Forms and variants</h3>
+            <div class="columns">
+              <div class="column is-half">
+                <ul id="forms"></ul>
+              </div>
+              <div class="column is-half">
+                <ul id="variants"></ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tile 3: Composition (2:1) -->
+          <div class="box">
+            <h3 class="title is-5">Composition</h3>
+            <div class="columns">
+              <div class="column is-half">
+                <ul id="decomposition"></ul>
+              </div>
+              <div class="column is-half">
+                <ul id="supercompositions"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div data-include="/static/html/footer.html"></div>
+    <script type="module" src="/static/js/main.js"></script>
+  </body>
+  </html>

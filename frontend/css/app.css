@@ -1,40 +1,76 @@
-/* Minimal styles for clickable character chips and square tags */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Noto+Serif+HK:wght@200..900&family=Noto+Serif+JP:wght@200..900&family=Noto+Serif+KR:wght@200..900&family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* Minimal styles: rely on Bulma for colors and spacing */
 .char-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.15rem 0.35rem;
-  border: 1px solid #dbdbdb;
-  border-radius: 4px;
   text-decoration: none;
-  color: inherit;
-  line-height: 1;
 }
 
-.char-chip:hover {
-  background: #f5f5f5;
-}
+/* Only make the tag square (no colors/spacing overrides) */
+.tag.tag-char { border-radius: 0; }
 
-.char-glyph {
-  font-size: 1.2em;
-}
+/* CJK Learn summary styles (scoped) */
+.cjk-learn .kr { font-family: "Noto Serif KR", serif; color: #22a6b3; }
+.cjk-learn .tc { font-family: "Noto Serif TC", serif; color: #4834d4; }
+.cjk-learn .hk { font-family: "Noto Serif HK", serif; color: #be2edd; }
+.cjk-learn .sc { font-family: "Noto Serif SC", serif; color: #f0932b; }
+.cjk-learn .jp { font-family: "Noto Serif JP", serif; color: #eb4d4b; }
+.cjk-learn .mega { color: #ff7979; }
+.cjk-learn .sans { font-family: "Noto Sans", sans-serif; }
 
-.sq-tag {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.1em;
-  height: 1.1em;
-  font-size: 0.65em;
-  border: 1px solid #b5b5b5;
-  border-radius: 0; /* square */
-  margin-left: 0.25rem;
-  color: #363636;
-}
+.cjk-learn { text-align: center; }
+.cjk-learn .definition { font-size: 35px; font-family: "Noto Serif", serif; }
+.cjk-learn .label { font-size: 20px; margin-top: 0.2em; font-style: italic; }
 
-.sq-tag.is-principal {
-  background: #00d1b2; /* Bulma primary */
-  border-color: #00c4a7;
-  color: #fff;
+.cjk-learn .chars { width: 100%; border-collapse: collapse; }
+.cjk-learn .chars td {
+  border: none;
+  vertical-align: top;
+  width: 24vw;
+  text-align: center;
 }
+.cjk-learn .char { font-size: 70px; line-height: 1; }
 
+/* Fallback when no CJK learn — enforce black + Noto Sans */
+.cjk-learn.not-cjk, .cjk-learn.not-cjk * {
+  color: #000;
+  font-family: "Noto Sans", sans-serif;
+}
+.cjk-learn.not-cjk .char { font-size: 70px; }
+
+/* Font preview inline chips */
+/* (Removed font preview UI per clarified intent) */
+
+/* Indices line (joined numbers) */
+.cjk-learn .indices-line { margin: 0.25rem 0 0.25rem; color: #666; font-size: 0.95rem; }
+
+/* Skeleton loader */
+.cjk-learn .skeleton-block {
+  height: 90px;
+  margin: 0 auto 0.5rem;
+  max-width: 300px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #eee 25%, #f5f5f5 37%, #eee 63%);
+  background-size: 400% 100%;
+  animation: cjk-skeleton 1.2s ease-in-out infinite;
+}
+.cjk-learn .skeleton-lines {
+  height: 14px;
+  margin: 0 auto 0.75rem;
+  max-width: 260px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #eee 25%, #f5f5f5 37%, #eee 63%);
+  background-size: 400% 100%;
+  animation: cjk-skeleton 1.2s ease-in-out infinite;
+}
+.cjk-learn .button.is-skeleton {
+  pointer-events: none;
+  color: transparent;
+  background: linear-gradient(90deg, #eee 25%, #f5f5f5 37%, #eee 63%);
+  background-size: 400% 100%;
+  animation: cjk-skeleton 1.2s ease-in-out infinite;
+  border-color: #eee;
+}
+@keyframes cjk-skeleton {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}

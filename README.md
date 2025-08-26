@@ -20,8 +20,8 @@ server/
 frontend/
   html/             # HTML pages and includes (index.html, header.html, footer.html)
   css/              # bulma.min.css copied from npm
-  ts/               # TypeScript sources (main.ts only)
-  js/               # compiled JS output (main.js)
+  ts/               # TypeScript sources (main.ts, router.ts, components/)
+  js/               # compiled JS output (main.js, router.js)
 Makefile            # Dev shortcuts
 requirements.txt    # Python dependencies
 package.json        # TypeScript + Bulma dev deps and scripts
@@ -72,11 +72,14 @@ make web && make run
 
 ## API
 - `GET /healthz` → `{ "status": "ok" }`
-- `GET /api/lookup?char=漢` → structured JSON with forms, composition, and variants
+- `GET /api/char?char=漢` → structured JSON with forms, composition, and variants
+- `GET /api/lists?type=rtk|rth|rsh|hanja&field=chars|fields` → ordered list data built from CJKLearn and HanjaLevels
 
 Example:
 ```
-curl 'http://localhost:8000/api/lookup?char=漢'
+curl 'http://localhost:8000/api/char?char=漢'
+curl 'http://localhost:8000/api/lists?type=rtk&field=chars'
+curl 'http://localhost:8000/api/lists?type=hanja&field=fields' | head
 ```
 
 ## Static Site
@@ -87,11 +90,10 @@ curl 'http://localhost:8000/api/lookup?char=漢'
   - `<div data-include="/static/html/footer.html"></div>`
   The include loader in `frontend/ts/main.ts` fetches and injects these at runtime using `fetch` (no extra npm dependency).
 
-### Client-side Router
-- A tiny router is embedded in `frontend/ts/main.ts` using the History API.
-- Character pages are at `/char/:ch` (e.g., `/char/漢`). The unified server serves `index.html` for any `/char/*` path so direct loads and refreshes work; the router then reads the URL and performs the lookup.
-- Any rendered character in the UI is clickable and navigates to `/char/:ch` (forms, composition parts, variants, and the summary chip).
-- The principal character is marked with a small square tag. The UI is ready to display additional square tags for list membership (e.g., RTK/JLPT) when the API provides them.
+### Navigation
+- No client-side router. Links navigate directly to `/char/:ch`; the page performs a single lookup on load.
+- Any rendered character in the UI is a normal link to `/char/:ch`.
+- The Character page shows a CJK Learn summary (keywords and per-region indices) followed by two tiles: Forms & variants (only when different/present) and Composition (decomposition + merged supercompositions).
 
 ### Dev Server Controls
 - Unified server port: `PORT=8000 make run` (or `make dev`).
