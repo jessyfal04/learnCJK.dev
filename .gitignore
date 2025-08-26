@@ -9,10 +9,6 @@ __pycache__/
 
 # Node / TypeScript
 node_modules/
-frontend-app/node_modules/
-frontend-app/.svelte-kit/
-frontend-app/build/
-**/.svelte-kit/
 **/node_modules/
 npm-debug.log*
 yarn-error.log*
@@ -22,7 +18,7 @@ yarn-error.log*
 .idea/
 .vscode/
 
-# Web build artifacts (keep compiled assets tracked if committed)
-# Uncomment if you prefer to ignore built files and build in CI
-web/js/*.js
-web/css/bulma.min.css
+# Frontend build artifacts
+frontend/js/*.js
+frontend/js/*.js.map
+frontend/css/bulma.min.css
