@@ -12,6 +12,7 @@ from fastapi.responses import FileResponse, HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from backend.api.char import get_info
+import json
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -87,6 +88,36 @@ def api_lookup(char: str, output_format: Optional[str] = None):
     return ci.to_dict()
 
 
+@app.get("/api/lists")
+def api_lists(type: str, field: str):
+    """
+    Return list data from backend/data/lists.json.
+
+    Query params:
+    - type: one of rtk, rth, rsh, hanja
+    - field: one of chars, fields
+    """
+    lists_path = ROOT / "backend" / "data" / "lists.json"
+    if not lists_path.exists():
+        raise HTTPException(status_code=500, detail="lists.json not found. Generate it with cjk_list_to_json.py")
+
+    try:
+        with open(lists_path, "r", encoding="utf-8") as fh:
+            data = json.load(fh)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to read lists.json")
+
+    if type not in data:
+        raise HTTPException(status_code=400, detail=f"Invalid type. Expected one of {sorted(data.keys())}")
+    if field not in {"chars", "fields"}:
+        raise HTTPException(status_code=400, detail="Invalid field. Expected 'chars' or 'fields'")
+
+    bucket = data[type]
+    if field not in bucket:
+        raise HTTPException(status_code=400, detail=f"Field '{field}' not available for type '{type}'")
+    return bucket[field]
+
+
 # Pre-build assets opportunistically
 ensure_css()
 
@@ -132,4 +163,3 @@ if __name__ == "__main__":
         reload=True,
         reload_dirs=[str(ROOT / "backend"), str(ROOT / "server"), str(ROOT / "frontend")],
     )
-

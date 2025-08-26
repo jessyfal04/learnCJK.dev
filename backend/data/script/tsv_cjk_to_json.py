@@ -16,8 +16,8 @@ import json
 import os
 
 base = os.path.dirname(__file__)
-tsv_path = os.path.join(base, "CJK_learn.tsv")
-json_path = os.path.join(base, "CJK_learn.json")
+tsv_path = os.path.join(base, "../in/CJK_learn.tsv")
+json_path = os.path.join(base, "../CJK_learn.json")
 
 out_map = {}
 if os.path.exists(tsv_path):

@@ -7,7 +7,7 @@ import json
 import os
 
 base = os.path.dirname(__file__)
-tsv_path = os.path.join(base, "kDefinition.tsv")
+tsv_path = os.path.join(base, "../in/kDefinition.tsv")
 json_path = os.path.join(base, "kDefinition.json")
 
 out_map = {}
