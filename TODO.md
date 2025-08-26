@@ -1,10 +1,8 @@
-- Beautify the bulma
 - Make a deployment folder
 
 - rendered character
-	- if in list or principal
-	- which language / neutral if component / ...
-
+	- if in list or principal, square tag
+	
 clikable character 
 - redirect to /char/...
 
@@ -15,10 +13,7 @@ list (lists.py, ordoned by Index):
 - hanja-level,
 - jlpt-level
 
-
-
-
-
+<!-- - which language / neutral if component / ... -->
 
 remember learned
 	- new background if learned

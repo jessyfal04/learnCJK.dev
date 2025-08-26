@@ -89,7 +89,9 @@ curl 'http://localhost:8000/api/lookup?char=漢'
 
 ### Client-side Router
 - A tiny router is embedded in `frontend/ts/main.ts` using the History API.
-- Character pages are at `/char/:ch` (e.g., `/char/漢`). The frontend dev server serves `index.html` for any `/char/*` path so direct loads and refreshes work; the router then reads the URL and performs the lookup.
+- Character pages are at `/char/:ch` (e.g., `/char/漢`). The unified server serves `index.html` for any `/char/*` path so direct loads and refreshes work; the router then reads the URL and performs the lookup.
+- Any rendered character in the UI is clickable and navigates to `/char/:ch` (forms, composition parts, variants, and the summary chip).
+- The principal character is marked with a small square tag. The UI is ready to display additional square tags for list membership (e.g., RTK/JLPT) when the API provides them.
 
 ### Dev Server Controls
 - Unified server port: `PORT=8000 make run` (or `make dev`).

@@ -44,5 +44,9 @@
 - Serving (dev): Unified Python server at `http://localhost:8000` serves static files under `/static`, exposes `/api/*`, and serves `index.html` for `/char/*` to support the client-side router.
 - HTML includes: pages may include common fragments via `<div data-include="/static/html/header.html">` and `/static/html/footer.html`. The loader in `frontend/ts/main.ts` fetches and injects these at runtime (no extra deps).
 
+## Frontend UX Notes
+- Characters render as clickable chips; clicking navigates to `/char/:ch` without a full reload.
+- The principal character displays a square tag. The chip component supports extra square tags for future list membership (RTK/JLPT/etc.) once the backend provides that metadata.
+
 ## Documentation Policy
 - Any code changes that affect usage or structure must update both this AGENTS.md and README.md to keep docs in sync.

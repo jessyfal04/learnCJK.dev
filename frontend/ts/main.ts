@@ -86,6 +86,23 @@ function item(key: string, value: string | string[]): string {
   return `<li><strong>${key}:</strong> ${v}</li>`;
 }
 
+function charChipHTML(
+  ch: string,
+  opts?: { principal?: boolean; tags?: string[] }
+): string {
+  const principal = opts?.principal === true;
+  const tags = opts?.tags ?? [];
+  const tagSpans = [
+    ...(principal ? ["<span class=\"sq-tag is-principal\" title=\"principal\">主</span>"] : []),
+    ...tags.map((t) => `<span class=\"sq-tag\">${t}</span>`),
+  ].join('');
+  return `
+    <a class="char-chip" data-char="${ch}" href="/char/${encodeURIComponent(ch)}" title="${ch}">
+      <span class="char-glyph">${ch}</span>${tagSpans}
+    </a>
+  `;
+}
+
 function renderCjkLearn(obj: CJKLearn | undefined | null): string {
   if (!obj) return '—';
   // show key: value per line
@@ -100,38 +117,53 @@ function renderResults(d: LookupResponse): void {
   variantsEl.innerHTML = '';
   if (unihanEl) unihanEl.textContent = '—';
   if (cjklearnEl) cjklearnEl.textContent = '—';
-  if (summaryChar) summaryChar.textContent = d.char || '—';
+  if (summaryChar) summaryChar.innerHTML = d.char ? charChipHTML(d.char, { principal: true }) : '—';
   if (summaryLang) summaryLang.textContent = d.detected_input_lang || '—';
 
   formsEl.insertAdjacentHTML(
     'beforeend',
-    item('Japanese', `${d.japanese.char} (${d.japanese.same_as_input ? 'same' : 'diff'})`)
+    item('Japanese', charChipHTML(d.japanese.char, { principal: d.japanese.same_as_input }))
   );
   formsEl.insertAdjacentHTML(
     'beforeend',
-    item('Simplified', `${d.simplified.char} (${d.simplified.same_as_input ? 'same' : 'diff'})`)
+    item('Simplified', charChipHTML(d.simplified.char, { principal: d.simplified.same_as_input }))
   );
   formsEl.insertAdjacentHTML(
     'beforeend',
-    item('Traditional', `${d.traditional.char} (${d.traditional.same_as_input ? 'same' : 'diff'})`)
+    item('Traditional', charChipHTML(d.traditional.char, { principal: d.traditional.same_as_input }))
   );
 
-  compEl.insertAdjacentHTML('beforeend', item('Decomposition', d.composition.decomposition || []));
   compEl.insertAdjacentHTML(
     'beforeend',
-    item('JP supercompositions', d.composition.jp_supercompositions || [])
+    item(
+      'Decomposition',
+      (d.composition.decomposition || []).map((c) => charChipHTML(c, { principal: c === d.char }))
+    )
   );
   compEl.insertAdjacentHTML(
     'beforeend',
-    item('ZH supercompositions', d.composition.zh_supercompositions || [])
+    item(
+      'JP supercompositions',
+      (d.composition.jp_supercompositions || []).map((c) => charChipHTML(c, { principal: c === d.char }))
+    )
   );
   compEl.insertAdjacentHTML(
     'beforeend',
-    item('Merged supercompositions', d.composition.merged_supercompositions || [])
+    item(
+      'ZH supercompositions',
+      (d.composition.zh_supercompositions || []).map((c) => charChipHTML(c, { principal: c === d.char }))
+    )
+  );
+  compEl.insertAdjacentHTML(
+    'beforeend',
+    item(
+      'Merged supercompositions',
+      (d.composition.merged_supercompositions || []).map((c) => charChipHTML(c, { principal: c === d.char }))
+    )
   );
 
   (d.variants || []).forEach((v) => {
-    variantsEl.insertAdjacentHTML('beforeend', `<li>${v}</li>`);
+    variantsEl.insertAdjacentHTML('beforeend', `<li>${charChipHTML(v, { principal: v === d.char })}</li>`);
   });
 
   if (unihanEl) unihanEl.textContent = d.unihan_definition || '—';
@@ -174,6 +206,18 @@ form?.addEventListener('submit', (e) => {
 startRouter((ch: string) => {
   input.value = ch;
   void doLookup(ch, false);
+});
+
+// Delegate click on any element with data-char to navigate using SPA router
+document.addEventListener('click', (ev) => {
+  const target = ev.target as HTMLElement | null;
+  if (!target) return;
+  const link = target.closest('[data-char]') as HTMLElement | null;
+  if (!link) return;
+  const ch = link.getAttribute('data-char');
+  if (!ch) return;
+  ev.preventDefault();
+  navigateToChar(ch);
 });
 
 // Simple HTML includes: fetch and inject content for elements with [data-include]
