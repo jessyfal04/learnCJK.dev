@@ -7,7 +7,7 @@
     "build:css": "mkdir -p frontend/css && (cp node_modules/bulma/css/bulma.min.css frontend/css/bulma.min.css || cp node_modules/bulma/css/bulma.css frontend/css/bulma.min.css)",
     "build:web": "npm run build:ts && npm run build:css",
     "watch:web": "tsc -w -p frontend/tsconfig.json",
-    "serve:web": "node frontend/js/dev_server.js || (npm run build:ts && node frontend/js/dev_server.js)"
+    "serve:web": "echo 'Deprecated: unified Python server serves frontend. Use make dev or make run.' && exit 1"
   },
   "devDependencies": {
     "bulma": "^1.0.4",

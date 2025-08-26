@@ -1,14 +1,25 @@
 - Beautify the bulma
 - Make a deployment folder
 
-font if a heisig one
+- rendered character
+	- if in list or principal
+	- which language / neutral if component / ...
 
-list rtk, rth, rts, hanaja-level (lists.py, ordoned by Index)
+clikable character 
+- redirect to /char/...
 
-clikable character
+list (lists.py, ordoned by Index):
+- rtk, 
+- rth, 
+- rts, 
+- hanja-level,
+- jlpt-level
+
+
+
+
+
 
 remember learned
-propose new one
-
-put the char/
-<span class="tag is-link is-normal">Normal</span>
+	- new background if learned
+- propose new one

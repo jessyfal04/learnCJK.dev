@@ -1,5 +1,51 @@
-// Note: use explicit .js extension for browser ESM imports after TS compile
-import { startRouter, navigateToChar } from './router.js';
+// Lightweight in-file router using History API
+type RouteHandler = (ch: string) => void;
+let __routerHandler: RouteHandler | null = null;
+function startRouter(h: RouteHandler): void {
+  __routerHandler = h;
+  window.addEventListener('popstate', () => {
+    const state = history.state as { char?: string } | null;
+    if (state && state.char) {
+      __routerHandler?.(state.char);
+      return;
+    }
+    const m = location.pathname.match(/^\/char\/(.+)$/);
+    if (m) {
+      try {
+        const ch = decodeURIComponent(m[1]);
+        __routerHandler?.(ch);
+      } catch {
+        /* ignore */
+      }
+    }
+  });
+  const m = location.pathname.match(/^\/char\/(.+)$/);
+  if (m) {
+    try {
+      const ch = decodeURIComponent(m[1]);
+      history.replaceState({ char: ch }, '', location.pathname + location.search);
+      __routerHandler?.(ch);
+    } catch {
+      /* ignore */
+    }
+  }
+}
+function navigateToChar(ch: string, replace = false): void {
+  if (!__routerHandler) {
+    if (replace) {
+      history.replaceState({ char: ch }, '', `/char/${encodeURIComponent(ch)}`);
+    } else {
+      history.pushState({ char: ch }, '', `/char/${encodeURIComponent(ch)}`);
+    }
+    return;
+  }
+  if (replace) {
+    history.replaceState({ char: ch }, '', `/char/${encodeURIComponent(ch)}`);
+  } else {
+    history.pushState({ char: ch }, '', `/char/${encodeURIComponent(ch)}`);
+  }
+  __routerHandler(ch);
+}
 
 const form = document.getElementById('lookupForm') as HTMLFormElement;
 const input = document.getElementById('charInput') as HTMLInputElement;
